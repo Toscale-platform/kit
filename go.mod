@@ -1,4 +1,4 @@
-module toscale-kit
+module github.com/Toscale-platform/toscale-kit
 
 go 1.21
 
