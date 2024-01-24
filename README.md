@@ -44,6 +44,23 @@ func main() {
 }
 ```
 
+### HTTP
+
+Main library: [valyala/fasthttp](https://github.com/valyala/fasthttp)
+
+```go
+package main
+
+import "github.com/Toscale-platform/toscale-kit/http"
+
+func main() {
+    http.Get("https://example.com", nil)
+
+    body := Body{}
+    http.Post("https://example.com", &body, nil)
+}
+```
+
 ### Validator
 
 ```go

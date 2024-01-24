@@ -5,10 +5,18 @@ go 1.21
 require (
 	github.com/rs/zerolog v1.31.0
 	github.com/spf13/viper v1.18.2
+	github.com/valyala/fasthttp v1.51.0
+)
+
+require (
+	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/klauspost/compress v1.17.4 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/goccy/go-json v0.10.2
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
