@@ -78,3 +78,46 @@ func main() {
     }
 }
 ```
+
+
+### Output
+
+```go
+package main
+
+import "github.com/Toscale-platform/toscale-kit/output"
+
+func main() {
+	r := router.New()
+	
+	r.GET("/path", handler)
+	r.OPTIONS("/path", output.CORSOptions)
+}
+
+func handler(ctx *fasthttp.RequestCtx){
+    res := interface{}
+	
+    output.OutputJson(ctx, 200, res)
+    output.JsonNoIndent(ctx, 200, res)
+	
+	output.JsonMessageResult(ctx, 200, "message")
+}
+```
+
+### Auth
+
+```go
+package main
+
+import "github.com/Toscale-platform/toscale-kit/auth"
+
+func main() {
+	isDebug := env.GetBool("DEBUG")
+	host := env.GetString("AUTH_HOST")
+	authManager := auth.Init(host, isDebug)
+	
+	r := router.New()
+	
+	r.GET("/path", authManager.IsAdmin(handler))
+}
+```

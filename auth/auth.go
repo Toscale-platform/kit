@@ -28,12 +28,12 @@ func Init(host string, isDebug bool) *Auth {
 	}
 }
 
-func (a *Auth) isAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		if !a.isDebug {
 			id, err := verifyAdmin(ctx, a.host)
 			if err != nil {
-				output.OutputJsonMessageResult(ctx, 403, "forbidden")
+				output.JsonMessageResult(ctx, 403, "forbidden")
 				return
 			}
 			ctx.SetUserValue("user", id)
