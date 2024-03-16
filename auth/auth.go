@@ -19,21 +19,24 @@ type response struct {
 	User int `json:"user"`
 }
 
-var (
-	httpClient = http.Client{}
-	debug      bool
-	host       string
-)
-
-func Init(addr string, isDebug bool) {
-	debug = isDebug
-	host = addr
+type Auth struct {
+	isDebug bool
+	host    string
 }
 
-func Auth(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+var httpClient = http.Client{}
+
+func Init(host string, isDebug bool) *Auth {
+	return &Auth{
+		isDebug: isDebug,
+		host:    host,
+	}
+}
+
+func (a *Auth) isAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
-		if !debug {
-			id, err := verifyAdmin(ctx)
+		if !a.isDebug {
+			id, err := verifyAdmin(ctx, a.host)
 			if err != nil {
 				outputJsonMessageResult(ctx, 403, "forbidden")
 				return
@@ -46,22 +49,7 @@ func Auth(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	}
 }
 
-func outputJsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
-	// Write content-type, statuscode, payload
-	ctx.Response.Header.Set("Content-Type", "application/json")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
-	ctx.Response.Header.SetStatusCode(code)
-	out := out{code, r}
-	jsonResult, _ := json.Marshal(out)
-	if _, err := fmt.Fprint(ctx, string(jsonResult)); err != nil {
-		log.Error().Err(err).Send()
-	}
-	ctx.Response.Header.Set("Connection", "close")
-}
-
-func verifyAdmin(ctx *fasthttp.RequestCtx) (int, error) {
+func verifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
 	if token == "" {
 		return 0, errors.New("bearer token required")
@@ -99,4 +87,19 @@ func verifyAdmin(ctx *fasthttp.RequestCtx) (int, error) {
 	}
 
 	return r.User, nil
+}
+
+func outputJsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
+	// Write content-type, statuscode, payload
+	ctx.Response.Header.Set("Content-Type", "application/json")
+	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
+	ctx.Response.Header.SetStatusCode(code)
+	out := out{code, r}
+	jsonResult, _ := json.Marshal(out)
+	if _, err := fmt.Fprint(ctx, string(jsonResult)); err != nil {
+		log.Error().Err(err).Send()
+	}
+	ctx.Response.Header.Set("Connection", "close")
 }
