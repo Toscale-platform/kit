@@ -2,18 +2,13 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"github.com/Toscale-platform/toscale-kit/log"
+	"github.com/Toscale-platform/toscale-kit/output"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
 	"io"
 	"net/http"
 )
-
-type out struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
 
 type response struct {
 	User int `json:"user"`
@@ -38,7 +33,7 @@ func (a *Auth) isAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 		if !a.isDebug {
 			id, err := verifyAdmin(ctx, a.host)
 			if err != nil {
-				outputJsonMessageResult(ctx, 403, "forbidden")
+				output.OutputJsonMessageResult(ctx, 403, "forbidden")
 				return
 			}
 			ctx.SetUserValue("user", id)
@@ -87,19 +82,4 @@ func verifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 	}
 
 	return r.User, nil
-}
-
-func outputJsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
-	// Write content-type, statuscode, payload
-	ctx.Response.Header.Set("Content-Type", "application/json")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
-	ctx.Response.Header.SetStatusCode(code)
-	out := out{code, r}
-	jsonResult, _ := json.Marshal(out)
-	if _, err := fmt.Fprint(ctx, string(jsonResult)); err != nil {
-		log.Error().Err(err).Send()
-	}
-	ctx.Response.Header.Set("Connection", "close")
 }
