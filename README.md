@@ -121,3 +121,18 @@ func main() {
     r.GET("/path", authManager.IsAdmin(handler))
 }
 ```
+
+### Exchange
+
+```go
+package main
+
+import "github.com/Toscale-platform/toscale-kit/exchange"
+
+func main() {
+    symbols, err := exchange.GetSymbols("binance")
+    if err != nil {
+        //
+    }
+}
+```
