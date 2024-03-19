@@ -2,12 +2,13 @@ package auth
 
 import (
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/Toscale-platform/toscale-kit/log"
 	"github.com/Toscale-platform/toscale-kit/output"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
-	"io"
-	"net/http"
 )
 
 type response struct {
@@ -31,7 +32,7 @@ func Init(host string, isDebug bool) *Auth {
 func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		if !a.isDebug {
-			id, err := verifyAdmin(ctx, a.host)
+			id, err := VerifyAdmin(ctx, a.host)
 			if err != nil {
 				output.JsonMessageResult(ctx, 403, "forbidden")
 				return
@@ -44,7 +45,7 @@ func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	}
 }
 
-func verifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
+func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
 	if token == "" {
 		return 0, errors.New("bearer token required")
