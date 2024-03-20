@@ -1,6 +1,8 @@
 package http
 
 import (
+	"errors"
+	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
 )
@@ -38,7 +40,7 @@ func request(method, url, token string, body interface{}, v interface{}) error {
 	if body != nil {
 		bytes, err := json.Marshal(body)
 		if err != nil {
-			return err
+			return errors.New("body parsing error: " + err.Error())
 		}
 
 		req.SetBodyRaw(bytes)
@@ -52,6 +54,10 @@ func request(method, url, token string, body interface{}, v interface{}) error {
 
 	fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(resp)
+
+	if resp.StatusCode() < 200 || resp.StatusCode() > 299 {
+		return fmt.Errorf("status code %d: %s", resp.StatusCode(), string(resp.Body()))
+	}
 
 	if v != nil {
 		if err := json.Unmarshal(resp.Body(), v); err != nil {
