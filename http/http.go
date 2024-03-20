@@ -1,7 +1,6 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
@@ -40,7 +39,7 @@ func request(method, url, token string, body interface{}, v interface{}) error {
 	if body != nil {
 		bytes, err := json.Marshal(body)
 		if err != nil {
-			return errors.New("body parsing error: " + err.Error())
+			return fmt.Errorf("body parsing error: %s", err.Error())
 		}
 
 		req.SetBodyRaw(bytes)
@@ -61,7 +60,7 @@ func request(method, url, token string, body interface{}, v interface{}) error {
 
 	if v != nil {
 		if err := json.Unmarshal(resp.Body(), v); err != nil {
-			return errors.New("body to interface parsing error: " + err.Error())
+			return fmt.Errorf("body to interface parsing error: %s, body: %s", err.Error(), string(resp.Body()))
 		}
 	}
 
