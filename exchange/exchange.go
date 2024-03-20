@@ -11,6 +11,7 @@ type BinanceExchangeInfo struct {
 	Code    int    `json:"code"`
 	Message string `json:"msg"`
 	Symbols []struct {
+		Status     string `json:"status"`
 		BaseAsset  string `json:"baseAsset"`
 		QuoteAsset string `json:"quoteAsset"`
 	} `json:"symbols"`
@@ -22,11 +23,13 @@ type KucoinSymbols struct {
 	Data []struct {
 		BaseCurrency  string `json:"baseCurrency"`
 		QuoteCurrency string `json:"quoteCurrency"`
+		EnableTrading bool   `json:"enableTrading"`
 	} `json:"data"`
 }
 
 type PoloniexSymbols []struct {
 	DisplayName string `json:"displayName"`
+	State       string `json:"state"`
 }
 
 func GetSymbols(exchange string) (symbols []string, err error) {
@@ -46,6 +49,9 @@ func GetSymbols(exchange string) (symbols []string, err error) {
 		}
 
 		for _, symbol := range rawSymbols.Symbols {
+			if symbol.Status != "TRADING" {
+				continue
+			}
 			symbols = append(symbols, symbol.BaseAsset+"/"+symbol.QuoteAsset)
 		}
 	case "bitfinex":
@@ -71,6 +77,9 @@ func GetSymbols(exchange string) (symbols []string, err error) {
 		}
 
 		for _, symbol := range rawSymbols.Data {
+			if !symbol.EnableTrading {
+				continue
+			}
 			symbols = append(symbols, symbol.BaseCurrency+"/"+symbol.QuoteCurrency)
 		}
 	case "poloniex":
@@ -81,6 +90,9 @@ func GetSymbols(exchange string) (symbols []string, err error) {
 		}
 
 		for _, symbol := range rawSymbols {
+			if symbol.State != "NORMAL" {
+				continue
+			}
 			symbols = append(symbols, symbol.DisplayName)
 		}
 	default:
