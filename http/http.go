@@ -61,7 +61,7 @@ func request(method, url, token string, body interface{}, v interface{}) error {
 
 	if v != nil {
 		if err := json.Unmarshal(resp.Body(), v); err != nil {
-			return err
+			return errors.New("body to interface parsing error: " + err.Error())
 		}
 	}
 
