@@ -62,12 +62,24 @@ func GetSymbols(exchange string) (symbols []string, err error) {
 		}
 
 		for _, symbol := range rawSymbols[0] {
+			s := make([]string, 2)
+
 			if strings.Index(symbol, ":") > -1 {
-				s := strings.Split(symbol, ":")
-				symbols = append(symbols, s[0]+"/"+s[1])
+				s = strings.Split(symbol, ":")
 			} else {
-				symbols = append(symbols, symbol[:3]+"/"+symbol[3:])
+				s[0] = symbol[:3]
+				s[1] = symbol[3:]
 			}
+
+			for i := range s {
+				if s[i] == "UST" {
+					s[i] = "USDT"
+				} else if s[i] == "EUT" {
+					s[i] = "EURT"
+				}
+			}
+
+			symbols = append(symbols, s[0]+"/"+s[1])
 		}
 	case "kucoin":
 		rawSymbols := KucoinSymbols{}
