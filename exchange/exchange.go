@@ -62,6 +62,10 @@ func GetSymbols(exchange string) (symbols []string, err error) {
 		}
 
 		for _, symbol := range rawSymbols[0] {
+			if strings.HasPrefix(symbol, "TEST") {
+				continue
+			}
+
 			s := make([]string, 2)
 
 			if strings.Index(symbol, ":") > -1 {
