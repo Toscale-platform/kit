@@ -1,7 +1,6 @@
 package output
 
 import (
-	"fmt"
 	"github.com/Toscale-platform/toscale-kit/log"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
@@ -12,66 +11,54 @@ type out struct {
 	Message string `json:"message"`
 }
 
-func JsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
-	// Write content-type, statuscode, payload
-	ctx.Response.Header.Set("Content-Type", "application/json")
+func setHeaders(ctx *fasthttp.RequestCtx, contentType string, code int) {
+	ctx.Response.Header.Set("Content-Type", contentType)
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
 	ctx.Response.Header.SetStatusCode(code)
-	out := out{code, r}
-	jsonResult, _ := json.Marshal(out)
-	if _, err := fmt.Fprint(ctx, string(jsonResult)); err != nil {
-		log.Error().Err(err).Send()
-	}
 	ctx.Response.Header.Set("Connection", "close")
 }
 
 func CORSOptions(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("Content-Type", "text/html")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "*")
-	ctx.Response.Header.SetStatusCode(200)
-	ctx.Response.Header.Set("Connection", "close")
+	setHeaders(ctx, "text/html", 200)
 }
 
+// OutputJson does the same thing that JsonNoIndent does
+//
+// Deprecated: In previous versions this method added indentation, this is no longer relevant, use JsonNoIndent now
 func OutputJson(ctx *fasthttp.RequestCtx, code int, result interface{}) {
-	// Marshal provided interface into JSON structure
-	jsonResult, err := json.MarshalIndent(result, "", "    ")
-	if err != nil {
-		log.Error().Err(err).Send()
-		JsonMessageResult(ctx, 500, "errors.common.internalError")
-		return
-	}
-	// Write content-type, statuscode, payload
-	ctx.Response.Header.Set("Content-Type", "application/json")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
-	ctx.Response.SetStatusCode(code)
-	if _, err = fmt.Fprint(ctx, string(jsonResult)); err != nil {
-		log.Error().Err(err).Send()
-	}
-	ctx.Response.Header.Set("Connection", "close")
+	JsonNoIndent(ctx, code, result)
 }
 
+// JsonNoIndent marshaling and writing message without indent
 func JsonNoIndent(ctx *fasthttp.RequestCtx, code int, result interface{}) {
-	// Marshal provided interface into JSON structure
 	jsonResult, err := json.Marshal(result)
 	if err != nil {
 		log.Error().Err(err).Send()
-		JsonMessageResult(ctx, 500, "errors.common.internalError")
+		JsonMessageResult(ctx, 500, "errors.kit.internalError")
 		return
 	}
-	// Write content-type, statuscode, payload
-	ctx.Response.Header.Set("Content-Type", "application/json")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
-	ctx.Response.SetStatusCode(code)
-	if _, err = fmt.Fprint(ctx, string(jsonResult)); err != nil {
+
+	if _, err := ctx.Write(jsonResult); err != nil {
 		log.Error().Err(err).Send()
 	}
-	ctx.Response.Header.Set("Connection", "close")
+
+	setHeaders(ctx, "application/json", code)
+}
+
+// JsonMessageResult writing text message without indent
+func JsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
+	jsonResult, err := json.Marshal(out{code, r})
+	if err != nil {
+		log.Error().Err(err).Send()
+		JsonMessageResult(ctx, 500, "errors.kit.internalError")
+		return
+	}
+
+	if _, err := ctx.Write(jsonResult); err != nil {
+		log.Error().Err(err).Send()
+	}
+
+	setHeaders(ctx, "application/json", code)
 }

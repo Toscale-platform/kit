@@ -95,11 +95,9 @@ func main() {
 }
 
 func handler(ctx *fasthttp.RequestCtx){
-    res := interface{}
-
-    output.OutputJson(ctx, 200, res)
-    output.JsonNoIndent(ctx, 200, res)
+    res := map[string]string{"foo": "bar"}
 	
+    output.JsonNoIndent(ctx, 200, res)
     output.JsonMessageResult(ctx, 200, "message")
 }
 ```
