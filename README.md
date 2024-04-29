@@ -19,7 +19,7 @@ Then in your Go app you can do something like:
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/env"
+import "github.com/Toscale-platform/kit/env"
 
 func main() {
     token := env.GetString("TOKEN")
@@ -36,7 +36,7 @@ Main library: [rs/zerolog](https://github.com/rs/zerolog)
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/log"
+import "github.com/Toscale-platform/kit/log"
 
 func main() {
     log.Error().Msg("Error message")
@@ -51,7 +51,7 @@ Main library: [valyala/fasthttp](https://github.com/valyala/fasthttp)
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/http"
+import "github.com/Toscale-platform/kit/http"
 
 func main() {
     http.Get("https://example.com", nil)
@@ -66,7 +66,7 @@ func main() {
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/validator"
+import "github.com/Toscale-platform/kit/validator"
 
 func main() {
     if validator.IsSymbol("BTC/USDT") {
@@ -85,7 +85,7 @@ func main() {
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/output"
+import "github.com/Toscale-platform/kit/output"
 
 func main() {
     r := router.New()
@@ -107,7 +107,7 @@ func handler(ctx *fasthttp.RequestCtx){
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/auth"
+import "github.com/Toscale-platform/kit/auth"
 
 func main() {
     isDebug := env.GetBool("DEBUG")
@@ -125,7 +125,7 @@ func main() {
 ```go
 package main
 
-import "github.com/Toscale-platform/toscale-kit/exchange"
+import "github.com/Toscale-platform/kit/exchange"
 
 func main() {
     symbols, err := exchange.GetSymbols("binance")

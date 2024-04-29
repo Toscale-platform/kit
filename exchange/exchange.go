@@ -3,7 +3,7 @@ package exchange
 import (
 	"errors"
 	"fmt"
-	"github.com/Toscale-platform/toscale-kit/http"
+	"github.com/Toscale-platform/kit/http"
 	"strings"
 )
 

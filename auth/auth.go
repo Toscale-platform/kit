@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Toscale-platform/toscale-kit/log"
-	"github.com/Toscale-platform/toscale-kit/output"
+	"github.com/Toscale-platform/kit/log"
+	"github.com/Toscale-platform/kit/output"
 	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
 )
