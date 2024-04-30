@@ -11,17 +11,21 @@ type out struct {
 	Message string `json:"message"`
 }
 
-func setHeaders(ctx *fasthttp.RequestCtx, contentType string, code int) {
+func withHeaders(ctx *fasthttp.RequestCtx, contentType, allowHeaders string, code int) {
 	ctx.Response.Header.Set("Content-Type", contentType)
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
 	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Authorization")
+	ctx.Response.Header.Set("Access-Control-Allow-Headers", allowHeaders)
 	ctx.Response.Header.SetStatusCode(code)
 	ctx.Response.Header.Set("Connection", "close")
 }
 
+func withDefaultHeaders(ctx *fasthttp.RequestCtx, code int) {
+	withHeaders(ctx, "application/json", "Authorization", code)
+}
+
 func CORSOptions(ctx *fasthttp.RequestCtx) {
-	setHeaders(ctx, "text/html", 200)
+	withHeaders(ctx, "text/html", "*", 200)
 }
 
 // OutputJson does the same thing that JsonNoIndent does
@@ -44,7 +48,7 @@ func JsonNoIndent(ctx *fasthttp.RequestCtx, code int, result interface{}) {
 		log.Error().Err(err).Send()
 	}
 
-	setHeaders(ctx, "application/json", code)
+	withDefaultHeaders(ctx, code)
 }
 
 // JsonMessageResult writing text message without indent
@@ -60,5 +64,5 @@ func JsonMessageResult(ctx *fasthttp.RequestCtx, code int, r string) {
 		log.Error().Err(err).Send()
 	}
 
-	setHeaders(ctx, "application/json", code)
+	withDefaultHeaders(ctx, code)
 }
