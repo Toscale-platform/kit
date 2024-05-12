@@ -1,5 +1,9 @@
 # Toscale Kit
-A small toolkit for creating microservices
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/Toscale-platform/kit)](https://goreportcard.com/report/github.com/Toscale-platform/kit)
+[![Go Reference](https://pkg.go.dev/badge/github.com/Toscale-platform/kit.svg)](https://pkg.go.dev/github.com/Toscale-platform/kit)
+
+A small toolkit for creating microservices.
 
 ## Packages:
 
