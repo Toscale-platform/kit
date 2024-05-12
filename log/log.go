@@ -23,16 +23,6 @@ func init() {
 	}
 }
 
-/*
-l.Panic()
-l.Fatal()
-l.Error()
-l.Warn()
-l.Info()
-l.Debug()
-l.Trace()
-*/
-
 func Panic() *zerolog.Event {
 	return l.Panic()
 }

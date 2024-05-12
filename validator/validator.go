@@ -43,14 +43,14 @@ func IsSymbol(symbol string) bool {
 	return IsSymbolWith(symbol, "/")
 }
 
-func IsSymbolWith(symbol, separator string) bool {
+func IsSymbolWith(symbol, sep string) bool {
 	symbol = strings.TrimSpace(symbol)
 
 	if symbol == "" {
 		return false
 	}
 
-	if !strings.Contains(symbol, separator) {
+	if !strings.Contains(symbol, sep) {
 		return false
 	}
 
