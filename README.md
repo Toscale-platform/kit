@@ -9,7 +9,7 @@ A small toolkit for creating microservices.
 
 ### Env
 
-Main library: [spf13/viper](https://github.com/spf13/viper)
+Main library: [joho/godotenv](https://github.com/joho/godotenv)
 
 Create `.env` file in the root of your project or run app with env variables.
 ```dotenv
