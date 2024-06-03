@@ -14,7 +14,7 @@ type out struct {
 func withHeaders(ctx *fasthttp.RequestCtx, contentType, allowHeaders string, code int) {
 	ctx.Response.Header.Set("Content-Type", contentType)
 	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	ctx.Response.Header.Set("Access-Control-Allow-Headers", allowHeaders)
 	ctx.Response.Header.SetStatusCode(code)
 	ctx.Response.Header.Set("Connection", "close")
