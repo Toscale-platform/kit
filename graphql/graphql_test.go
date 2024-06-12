@@ -133,6 +133,17 @@ func TestHeader(t *testing.T) {
 	err := client.Run(req, &resp, 1*time.Second)
 	is.NoErr(err)
 	is.Equal(calls, 1)
-
 	is.Equal(resp.Value, "some data")
+}
+
+func TestRealAPI(t *testing.T) {
+	is := is.New(t)
+
+	client := NewClient("https://graphqlzero.almansi.me/api")
+
+	req := NewRequest("query {post(id: 1) {id title body}}")
+	var responseData map[string]interface{}
+	err := client.Run(req, &responseData, 30*time.Second)
+	is.NoErr(err)
+	is.Equal(responseData["post"].(map[string]interface{})["id"], "1")
 }
