@@ -9,7 +9,7 @@ A small toolkit for creating microservices.
 
 ### Env
 
-Main library: [joho/godotenv](https://github.com/joho/godotenv)
+Thanks: [joho/godotenv](https://github.com/joho/godotenv)
 
 Create `.env` file in the root of your project or run app with env variables.
 ```dotenv
@@ -21,65 +21,78 @@ DEBUG=true
 
 Then in your Go app you can do something like:
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/env"
 
-func main() {
-    token := env.GetString("TOKEN")
-    port := env.GetInt("PORT")
-    exchanges := env.GetSlice("EXCHANGES")
-    debug := env.GetBool("DEBUG")
-}
+token := env.GetString("TOKEN")
+port := env.GetInt("PORT")
+exchanges := env.GetSlice("EXCHANGES")
+debug := env.GetBool("DEBUG")
 ```
 
 ### Log
 
-Main library: [rs/zerolog](https://github.com/rs/zerolog)
+Thanks: [rs/zerolog](https://github.com/rs/zerolog)
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/log"
 
-func main() {
-    log.Error().Msg("Error message")
-    log.Info().Str("key", "value").Msg("Info message")
-}
+log.Error().Msg("Error message")
+log.Info().Str("key", "value").Msg("Info message")
 ```
 
 ### HTTP
 
-Main library: [valyala/fasthttp](https://github.com/valyala/fasthttp)
+Thanks: [valyala/fasthttp](https://github.com/valyala/fasthttp)
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/http"
 
-func main() {
-    http.Get("https://example.com", nil)
+http.Get("https://example.com", nil)
 
-    body := Body{}
-    http.Post("https://example.com", &body, nil)
-}
+body := Body{}
+http.Post("https://example.com", &body, nil)
+```
+
+### GraphQL
+
+Thanks: [machinebox/graph](https://github.com/machinebox/graphql)
+
+```go
+import (
+    "time"
+    "github.com/Toscale-platform/kit/http"
+)
+
+client := graphql.NewClient("https://machinebox.io/graphql")
+
+req := graphql.NewRequest(`
+    query ($key: String!) {
+        items (id: $key) {
+            field1
+            field2
+            field3
+        }
+    }
+`)
+
+req.Var("key", "value")
+req.Header.Set("Cache-Control", "no-cache")
+
+var respData ResponseStruct
+err := client.Run(req, &respData, time.Minute)
 ```
 
 ### Validator
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/validator"
 
-func main() {
-    if validator.IsSymbol("BTC/USDT") {
-        //
-    }
-	
-    if validator.IsExchange("binance") {
-        //
-    }
+if validator.IsSymbol("BTC/USDT") {
+    //
+}
+
+if validator.IsExchange("binance") {
+    //
 }
 ```
 
@@ -87,16 +100,12 @@ func main() {
 ### Output
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/output"
 
-func main() {
-    r := router.New()
-	
-    r.GET("/path", handler)
-    r.OPTIONS("/path", output.CORSOptions)
-}
+r := router.New()
+
+r.GET("/path", handler)
+r.OPTIONS("/path", output.CORSOptions)
 
 func handler(ctx *fasthttp.RequestCtx){
     res := map[string]string{"foo": "bar"}
@@ -109,32 +118,24 @@ func handler(ctx *fasthttp.RequestCtx){
 ### Auth
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/auth"
 
-func main() {
-    isDebug := env.GetBool("DEBUG")
-    host := env.GetString("AUTH_HOST")
-    authManager := auth.Init(host, isDebug)
-    
-    r := router.New()
-    
-    r.GET("/path", authManager.IsAdmin(handler))
-}
+isDebug := env.GetBool("DEBUG")
+host := env.GetString("AUTH_HOST")
+authManager := auth.Init(host, isDebug)
+
+r := router.New()
+
+r.GET("/path", authManager.IsAdmin(handler))
 ```
 
 ### Exchange
 
 ```go
-package main
-
 import "github.com/Toscale-platform/kit/exchange"
 
-func main() {
-    symbols, err := exchange.GetSymbols("binance")
-    if err != nil {
-        //
-    }
+symbols, err := exchange.GetSymbols("binance")
+if err != nil {
+    //
 }
 ```
