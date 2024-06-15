@@ -2,12 +2,13 @@ package auth
 
 import (
 	"errors"
+	"github.com/Toscale-platform/kit/log"
+	"github.com/goccy/go-json"
+	"github.com/gofiber/fiber/v2"
 	"io"
 	"net/http"
 
-	"github.com/Toscale-platform/kit/log"
 	"github.com/Toscale-platform/kit/output"
-	"github.com/goccy/go-json"
 	"github.com/valyala/fasthttp"
 )
 
@@ -37,12 +38,29 @@ func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 				output.JsonMessageResult(ctx, 403, "forbidden")
 				return
 			}
+
 			ctx.SetUserValue("user", id)
 		} else {
 			ctx.SetUserValue("user", 0)
 		}
+
 		next(ctx)
 	}
+}
+
+func (a *Auth) IsAdminFiber(c *fiber.Ctx) error {
+	if !a.isDebug {
+		id, err := VerifyAdminFiber(c, a.host)
+		if err != nil {
+			return fiber.NewError(403, "forbidden")
+		}
+
+		c.Locals("user", id)
+	} else {
+		c.Locals("user", 0)
+	}
+
+	return c.Next()
 }
 
 func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
@@ -51,6 +69,19 @@ func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 		return 0, errors.New("bearer token required")
 	}
 
+	return internalVerifyAdmin(token, host)
+}
+
+func VerifyAdminFiber(c *fiber.Ctx, host string) (int, error) {
+	token := string(c.Request().Header.Peek("Authorization"))
+	if token == "" {
+		return 0, errors.New("bearer token required")
+	}
+
+	return internalVerifyAdmin(token, host)
+}
+
+func internalVerifyAdmin(token, host string) (int, error) {
 	req, err := http.NewRequest("POST", host+"/verifyAdmin", nil)
 	if err != nil {
 		return 0, errors.New("http request making error: " + err.Error())
