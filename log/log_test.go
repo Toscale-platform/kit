@@ -53,8 +53,7 @@ func BenchmarkPretty(b *testing.B) {
 }
 
 func TestLogger(t *testing.T) {
-	logger := Logger()
-	logger.Info().Msg("New info message")
+	Logger().Info().Msg("New info message")
 }
 
 func TestPanic(t *testing.T) {
