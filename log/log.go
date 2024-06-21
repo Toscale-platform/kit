@@ -23,6 +23,10 @@ func init() {
 	}
 }
 
+func Logger() zerolog.Logger {
+	return l
+}
+
 func Panic() *zerolog.Event {
 	return l.Panic()
 }
