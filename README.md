@@ -84,8 +84,14 @@ err := client.Run(req, &respData, time.Minute)
 
 ### Validator
 
+Thanks: [go-playground/validator](https://github.com/go-playground/validator)
+
 ```go
 import "github.com/Toscale-platform/kit/validator"
+
+if validator.Is("email@example.com", "required,email") {
+	//
+}
 
 if validator.IsSymbol("BTC/USDT") {
     //
@@ -127,15 +133,4 @@ authManager := auth.Init(host, isDebug)
 r := router.New()
 
 r.GET("/path", authManager.IsAdmin(handler))
-```
-
-### Exchange
-
-```go
-import "github.com/Toscale-platform/kit/exchange"
-
-symbols, err := exchange.GetSymbols("binance")
-if err != nil {
-    //
-}
 ```

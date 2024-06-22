@@ -3,11 +3,17 @@ package validator
 import "testing"
 
 func TestIs(t *testing.T) {
-	if !Is("ABC", []string{"ABC", "DEF"}) {
+	if !Is("email@example.com", "required,email") {
+		t.Error("Expected true, got false")
+	}
+}
+
+func TestInSlice(t *testing.T) {
+	if !InSlice("ABC", []string{"ABC", "DEF"}) {
 		t.Error("Expected true, got false")
 	}
 
-	if Is("NOO", []string{"ABC", "DEF"}) {
+	if InSlice("NOO", []string{"ABC", "DEF"}) {
 		t.Error("Expected false, got true")
 	}
 }
@@ -44,13 +50,19 @@ func TestIsSymbolWith(t *testing.T) {
 }
 
 func TestIsBuyerMakerStr(t *testing.T) {
-	if !IsBuyerMakerStr("buy") {
+	if !IsBuyerMaker("buy") {
 		t.Error("Expected true, got false")
 	}
 }
 
 func TestIsBuyerMakerOC(t *testing.T) {
 	if !IsBuyerMakerOC(2.0, 3.0) {
+		t.Error("Expected true, got false")
+	}
+}
+
+func TestIsEmpty(t *testing.T) {
+	if !IsEmpty("       ") {
 		t.Error("Expected true, got false")
 	}
 }
