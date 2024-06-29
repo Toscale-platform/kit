@@ -6,8 +6,11 @@ func FiberCORS(c *fiber.Ctx) error {
 	c.Set("Access-Control-Allow-Origin", "*")
 	c.Set("Access-Control-Allow-Methods", "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS")
 
-	if c.Method() == "OPTIONS" {
+	if c.Method() == fiber.MethodOptions {
 		c.Set("Access-Control-Allow-Headers", "*")
+		c.Set("Content-Type", "text/html")
+		c.Status(fiber.StatusOK)
+		return nil
 	} else {
 		c.Set("Access-Control-Allow-Headers", "Authorization")
 	}
