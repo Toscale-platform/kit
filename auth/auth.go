@@ -32,6 +32,7 @@ type TotalAdminPermission struct {
 	IsAvaliableNews          bool `json:"isAvaliableNews,omitempty"`
 	IsAvaliableTwitter       bool `json:"isAvaliableTwitter,omitempty"`
 	IsAvaliableForex         bool `json:"isAvaliableForex,omitempty"`
+	IsAvaliableLanguages	 bool `json:"isAvaliableLanguages,omitempty"`
 }
 
 var httpClient = http.Client{}
@@ -61,6 +62,7 @@ func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string)
 				IsAvaliableNews:          true,
 				IsAvaliableTwitter:       true,
 				IsAvaliableForex:         true,
+				IsAvaliableLanguages:	  true,
 			}
 		}
 		return permissions, nil
@@ -141,6 +143,11 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 				if !permissions.IsAvaliableForex {
 					isInvalid = true
 				}				
+			}
+			case "languages" : {
+				if !permissions.IsAvaliableLanguages {
+					isInvalid = true
+				}
 			}
 			default : {
 				output.JsonMessageResult(ctx, 400, "invalid service")
