@@ -43,7 +43,30 @@ func Init(host string, isDebug bool) *Auth {
 	}
 }
 
-func (a *Auth) GetAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler	{
+func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string) (permissions TotalAdminPermission, err error)	{
+		if !a.isDebug {
+			permissions, err = FetchAdminPermissions(ctx, a.host)
+			if err != nil {
+				return
+			}
+		} else {
+			permissions = TotalAdminPermission{
+				IsAvaliableTools:         true,
+				IsAvaliableTerminals:     true,
+				IsAvaliableUsers:         true,
+				IsAvaliableBalances:      true,
+				IsAvaliableDocumentation: true,
+				IsAvaliableInsights:      true,
+				IsAvaliableBalancer:      true,
+				IsAvaliableNews:          true,
+				IsAvaliableTwitter:       true,
+				IsAvaliableForex:         true,
+			}
+		}
+		return permissions, nil
+}
+
+func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler	{
 	return func(ctx *fasthttp.RequestCtx) {
 		var permissions TotalAdminPermission
 		var err error
@@ -67,8 +90,70 @@ func (a *Auth) GetAdminPermissions(next fasthttp.RequestHandler, serviceName str
 				IsAvaliableForex:         true,
 			}
 		}
-		bytes, _ := json.Marshal(permissions)
-		output.JsonMessageResult(ctx, 200, string(bytes))
+		isInvalid := false
+		switch serviceName {
+			case "terminals" : {
+				if !permissions.IsAvaliableTerminals {
+					isInvalid = true
+				}
+			}
+			case "tools" : {
+				if !permissions.IsAvaliableTools {
+					isInvalid = true
+				}
+			} 
+			case "users" : {
+				if !permissions.IsAvaliableUsers {
+					isInvalid = true
+				}
+			}
+			case "balances" : {
+				if !permissions.IsAvaliableBalances {
+					isInvalid = true
+				}				
+			}
+			case "documentation" : {
+				if !permissions.IsAvaliableDocumentation {
+					isInvalid = true
+				}				
+			}
+			case "insights" : {
+				if !permissions.IsAvaliableInsights {
+					isInvalid = true
+				}				
+			}
+			case "balancer" : {
+				if !permissions.IsAvaliableBalancer {
+					isInvalid = true
+				}				
+			}
+			case "news" : {
+				if !permissions.IsAvaliableNews {
+					isInvalid = true
+				}				
+			}
+			case "twitter" : {
+				if !permissions.IsAvaliableTwitter {
+					isInvalid = true
+				}				
+			}
+			case "forex" : {
+				if !permissions.IsAvaliableForex {
+					isInvalid = true
+				}				
+			}
+			default : {
+				output.JsonMessageResult(ctx, 400, "invalid service")
+				return 
+			}
+		}
+
+		if isInvalid {
+			output.JsonMessageResult(ctx, 403, "forbidden")
+			return
+		}
+
+		next(ctx)
 	}
 }
 
