@@ -1,14 +1,21 @@
 package log
 
 import (
+	"github.com/Toscale-platform/kit/env"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"os"
 	"strconv"
 )
 
 var l = log.With().Caller().Logger()
 
 func init() {
+	if env.GetBool("DEBUG") {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+		l = log.With().Caller().Logger()
+	}
+
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
 		short := file
