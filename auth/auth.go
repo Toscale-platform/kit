@@ -22,17 +22,17 @@ type Auth struct {
 }
 
 type TotalAdminPermission struct {
-	IsAvaliableTools         bool `json:"isAvaliableTools,omitempty"`
-	IsAvaliableTerminals     bool `json:"isAvaliableTerminals,omitempty"`
-	IsAvaliableUsers         bool `json:"isAvaliableUsers,omitempty"`
-	IsAvaliableBalances      bool `json:"isAvaliableBalances,omitempty"`
-	IsAvaliableDocumentation bool `json:"isAvaliableDocumentation,omitempty"`
-	IsAvaliableInsights      bool `json:"isAvaliableInsights,omitempty"`
-	IsAvaliableBalancer      bool `json:"isAvaliableBalancer,omitempty"`
-	IsAvaliableNews          bool `json:"isAvaliableNews,omitempty"`
-	IsAvaliableTwitter       bool `json:"isAvaliableTwitter,omitempty"`
-	IsAvaliableForex         bool `json:"isAvaliableForex,omitempty"`
-	IsAvaliableLanguages	 bool `json:"isAvaliableLanguages,omitempty"`
+	IsAvaliableTools          bool `json:"tools,omitempty"`
+	IsAvaliableTerminals      bool `json:"terminals,omitempty"`
+	IsAvaliableUsers          bool `json:"users,omitempty"`
+	IsAvaliableBackendTesting bool `json:"backendTesting,omitempty"`
+	IsAvaliableDocumentation  bool `json:"documentation,omitempty"`
+	IsAvaliableInsights       bool `json:"insights,omitempty"`
+	IsAvaliableBalancer       bool `json:"balancer,omitempty"`
+	IsAvaliableNews           bool `json:"news,omitempty"`
+	IsAvaliableTwitter        bool `json:"twitter,omitempty"`
+	IsAvaliableForex          bool `json:"forex,omitempty"`
+	IsAvaliableLanguages	  bool `json:"languages,omitempty"`
 }
 
 var httpClient = http.Client{}
@@ -55,7 +55,7 @@ func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string)
 				IsAvaliableTools:         true,
 				IsAvaliableTerminals:     true,
 				IsAvaliableUsers:         true,
-				IsAvaliableBalances:      true,
+				IsAvaliableBackendTesting:true,
 				IsAvaliableDocumentation: true,
 				IsAvaliableInsights:      true,
 				IsAvaliableBalancer:      true,
@@ -83,7 +83,7 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 				IsAvaliableTools:         true,
 				IsAvaliableTerminals:     true,
 				IsAvaliableUsers:         true,
-				IsAvaliableBalances:      true,
+				IsAvaliableBackendTesting:true,
 				IsAvaliableDocumentation: true,
 				IsAvaliableInsights:      true,
 				IsAvaliableBalancer:      true,
@@ -109,8 +109,8 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 					isInvalid = true
 				}
 			}
-			case "balances" : {
-				if !permissions.IsAvaliableBalances {
+			case "backendTesting" : {
+				if !permissions.IsAvaliableBackendTesting {
 					isInvalid = true
 				}				
 			}
