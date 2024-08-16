@@ -11,9 +11,8 @@ func FiberCORS(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 		c.Status(fiber.StatusOK)
 		return nil
-	} else {
-		c.Set("Access-Control-Allow-Headers", "Authorization")
 	}
 
+	c.Set("Access-Control-Allow-Headers", "Authorization")
 	return c.Next()
 }

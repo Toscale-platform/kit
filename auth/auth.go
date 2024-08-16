@@ -32,7 +32,7 @@ type TotalAdminPermission struct {
 	IsAvaliableNews           bool `json:"news,omitempty"`
 	IsAvaliableTwitter        bool `json:"twitter,omitempty"`
 	IsAvaliableForex          bool `json:"forex,omitempty"`
-	IsAvaliableLanguages	  bool `json:"languages,omitempty"`
+	IsAvaliableLanguages      bool `json:"languages,omitempty"`
 }
 
 var httpClient = http.Client{}
@@ -44,34 +44,36 @@ func Init(host string, isDebug bool) *Auth {
 	}
 }
 
-func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string) (permissions TotalAdminPermission, err error)	{
-		if !a.isDebug {
-			permissions, err = FetchAdminPermissions(ctx, a.host)
-			if err != nil {
-				return
-			}
-		} else {
-			permissions = TotalAdminPermission{
-				IsAvaliableTools:         true,
-				IsAvaliableTerminals:     true,
-				IsAvaliableUsers:         true,
-				IsAvaliableBackendTesting:true,
-				IsAvaliableDocumentation: true,
-				IsAvaliableInsights:      true,
-				IsAvaliableBalancer:      true,
-				IsAvaliableNews:          true,
-				IsAvaliableTwitter:       true,
-				IsAvaliableForex:         true,
-				IsAvaliableLanguages:	  true,
-			}
+func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string) (permissions TotalAdminPermission, err error) {
+	if !a.isDebug {
+		permissions, err = FetchAdminPermissions(ctx, a.host)
+		if err != nil {
+			return
 		}
-		return permissions, nil
+	} else {
+		permissions = TotalAdminPermission{
+			IsAvaliableTools:          true,
+			IsAvaliableTerminals:      true,
+			IsAvaliableUsers:          true,
+			IsAvaliableBackendTesting: true,
+			IsAvaliableDocumentation:  true,
+			IsAvaliableInsights:       true,
+			IsAvaliableBalancer:       true,
+			IsAvaliableNews:           true,
+			IsAvaliableTwitter:        true,
+			IsAvaliableForex:          true,
+			IsAvaliableLanguages:      true,
+		}
+	}
+
+	return permissions, nil
 }
 
-func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler	{
+func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		var permissions TotalAdminPermission
 		var err error
+
 		if !a.isDebug {
 			permissions, err = FetchAdminPermissions(ctx, a.host)
 			if err != nil {
@@ -80,78 +82,92 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 			}
 		} else {
 			permissions = TotalAdminPermission{
-				IsAvaliableTools:         true,
-				IsAvaliableTerminals:     true,
-				IsAvaliableUsers:         true,
-				IsAvaliableBackendTesting:true,
-				IsAvaliableDocumentation: true,
-				IsAvaliableInsights:      true,
-				IsAvaliableBalancer:      true,
-				IsAvaliableNews:          true,
-				IsAvaliableTwitter:       true,
-				IsAvaliableForex:         true,
+				IsAvaliableTools:          true,
+				IsAvaliableTerminals:      true,
+				IsAvaliableUsers:          true,
+				IsAvaliableBackendTesting: true,
+				IsAvaliableDocumentation:  true,
+				IsAvaliableInsights:       true,
+				IsAvaliableBalancer:       true,
+				IsAvaliableNews:           true,
+				IsAvaliableTwitter:        true,
+				IsAvaliableForex:          true,
 			}
 		}
+
 		isInvalid := false
+
 		switch serviceName {
-			case "terminals" : {
+		case "terminals":
+			{
 				if !permissions.IsAvaliableTerminals {
 					isInvalid = true
 				}
 			}
-			case "tools" : {
+		case "tools":
+			{
 				if !permissions.IsAvaliableTools {
 					isInvalid = true
 				}
-			} 
-			case "users" : {
+			}
+		case "users":
+			{
 				if !permissions.IsAvaliableUsers {
 					isInvalid = true
 				}
 			}
-			case "backendTesting" : {
+		case "backendTesting":
+			{
 				if !permissions.IsAvaliableBackendTesting {
 					isInvalid = true
-				}				
+				}
 			}
-			case "documentation" : {
+		case "documentation":
+			{
 				if !permissions.IsAvaliableDocumentation {
 					isInvalid = true
-				}				
+				}
 			}
-			case "insights" : {
+		case "insights":
+			{
 				if !permissions.IsAvaliableInsights {
 					isInvalid = true
-				}				
+				}
 			}
-			case "balancer" : {
+		case "balancer":
+			{
 				if !permissions.IsAvaliableBalancer {
 					isInvalid = true
-				}				
+				}
 			}
-			case "news" : {
+		case "news":
+			{
 				if !permissions.IsAvaliableNews {
 					isInvalid = true
-				}				
+				}
 			}
-			case "twitter" : {
+		case "twitter":
+			{
 				if !permissions.IsAvaliableTwitter {
 					isInvalid = true
-				}				
+				}
 			}
-			case "forex" : {
+		case "forex":
+			{
 				if !permissions.IsAvaliableForex {
 					isInvalid = true
-				}				
+				}
 			}
-			case "languages" : {
+		case "languages":
+			{
 				if !permissions.IsAvaliableLanguages {
 					isInvalid = true
 				}
 			}
-			default : {
+		default:
+			{
 				output.JsonMessageResult(ctx, 400, "invalid service")
-				return 
+				return
 			}
 		}
 
@@ -216,7 +232,7 @@ func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 }
 
 func VerifyAdminFiber(c *fiber.Ctx, host string) (int, error) {
-	token := string(c.Request().Header.Peek("Authorization"))
+	token := c.Get("Authorization")
 	if token == "" {
 		return 0, errors.New("bearer token required")
 	}
