@@ -35,7 +35,7 @@ func VerifyUser(c *fiber.Ctx) error {
 
 		c.Locals("user", id)
 	} else {
-		c.Locals("user", 0)
+		c.Locals("user", uint64(0))
 	}
 
 	return c.Next()

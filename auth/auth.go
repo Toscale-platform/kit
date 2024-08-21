@@ -12,7 +12,7 @@ import (
 )
 
 type response struct {
-	User int `json:"user"`
+	User uint64 `json:"user"`
 }
 
 type Auth struct {
@@ -199,7 +199,7 @@ func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 
 			ctx.SetUserValue("user", id)
 		} else {
-			ctx.SetUserValue("user", 0)
+			ctx.SetUserValue("user", uint64(0))
 		}
 
 		next(ctx)
@@ -215,13 +215,13 @@ func (a *Auth) IsAdminFiber(c *fiber.Ctx) error {
 
 		c.Locals("user", id)
 	} else {
-		c.Locals("user", 0)
+		c.Locals("user", uint64(0))
 	}
 
 	return c.Next()
 }
 
-func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
+func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (uint64, error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
 	if validator.IsEmpty(token) {
 		return 0, errors.New("bearer token required")
@@ -230,7 +230,7 @@ func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 	return internalVerifyAdmin(token, host)
 }
 
-func VerifyUserFiber(c *fiber.Ctx, host string) (int, error) {
+func VerifyUserFiber(c *fiber.Ctx, host string) (uint64, error) {
 	token := c.Get("Authorization")
 	if validator.IsEmpty(token) {
 		return 0, errors.New("bearer token required")
@@ -239,7 +239,7 @@ func VerifyUserFiber(c *fiber.Ctx, host string) (int, error) {
 	return internalVerifyUser(token, host)
 }
 
-func VerifyAdminFiber(c *fiber.Ctx, host string) (int, error) {
+func VerifyAdminFiber(c *fiber.Ctx, host string) (uint64, error) {
 	token := c.Get("Authorization")
 	if validator.IsEmpty(token) {
 		return 0, errors.New("bearer token required")
@@ -278,7 +278,7 @@ func internalGetPermissions(token, host string) (perms TotalAdminPermission, err
 	return r, nil
 }
 
-func internalVerifyUser(token, host string) (int, error) {
+func internalVerifyUser(token, host string) (uint64, error) {
 	req, err := http.NewRequest("POST", host+"/verifyUser", nil)
 	if err != nil {
 		return 0, errors.New("http request making error: " + err.Error())
@@ -308,7 +308,7 @@ func internalVerifyUser(token, host string) (int, error) {
 	return r.User, nil
 }
 
-func internalVerifyAdmin(token, host string) (int, error) {
+func internalVerifyAdmin(token, host string) (uint64, error) {
 	req, err := http.NewRequest("POST", host+"/verifyAdmin", nil)
 	if err != nil {
 		return 0, errors.New("http request making error: " + err.Error())
