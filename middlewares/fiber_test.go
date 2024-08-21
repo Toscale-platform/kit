@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func TestFiberCORS(t *testing.T) {
+func TestCors(t *testing.T) {
 	app := fiber.New()
-	app.Use(FiberCORS)
+	app.Use(Cors)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"ok": true})
@@ -31,4 +31,20 @@ func TestFiberCORS(t *testing.T) {
 
 	assert.Equal(t, resp.Header.Get(fiber.HeaderAccessControlAllowHeaders), "*")
 	assert.Equal(t, resp.Header.Get(fiber.HeaderContentType), "text/html")
+}
+
+func TestVerifyUser(t *testing.T) {
+	app := fiber.New()
+	app.Use(VerifyUser)
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"ok": true})
+	})
+
+	getReq := httptest.NewRequest("GET", "/", nil)
+
+	resp, err := app.Test(getReq, 1)
+	assert.Nil(t, err)
+
+	assert.Equal(t, resp.StatusCode, 403)
 }

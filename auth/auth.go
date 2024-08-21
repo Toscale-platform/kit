@@ -3,13 +3,12 @@ package auth
 import (
 	"errors"
 	"github.com/Toscale-platform/kit/log"
+	"github.com/Toscale-platform/kit/output"
+	"github.com/Toscale-platform/kit/validator"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"io"
-	"net/http"
-
-	"github.com/Toscale-platform/kit/output"
 	"github.com/valyala/fasthttp"
+	"net/http"
 )
 
 type response struct {
@@ -182,7 +181,7 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 
 func FetchAdminPermissions(ctx *fasthttp.RequestCtx, host string) (perms TotalAdminPermission, err error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
-	if token == "" {
+	if validator.IsEmpty(token) {
 		return TotalAdminPermission{}, errors.New("bearer token required")
 	}
 
@@ -224,16 +223,25 @@ func (a *Auth) IsAdminFiber(c *fiber.Ctx) error {
 
 func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (int, error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
-	if token == "" {
+	if validator.IsEmpty(token) {
 		return 0, errors.New("bearer token required")
 	}
 
 	return internalVerifyAdmin(token, host)
 }
 
+func VerifyUserFiber(c *fiber.Ctx, host string) (int, error) {
+	token := c.Get("Authorization")
+	if validator.IsEmpty(token) {
+		return 0, errors.New("bearer token required")
+	}
+
+	return internalVerifyUser(token, host)
+}
+
 func VerifyAdminFiber(c *fiber.Ctx, host string) (int, error) {
 	token := c.Get("Authorization")
-	if token == "" {
+	if validator.IsEmpty(token) {
 		return 0, errors.New("bearer token required")
 	}
 
@@ -257,14 +265,9 @@ func internalGetPermissions(token, host string) (perms TotalAdminPermission, err
 		return TotalAdminPermission{}, errors.New("forbidden")
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return TotalAdminPermission{}, errors.New("body parsing error: " + err.Error())
-	}
-
 	r := TotalAdminPermission{}
 
-	if err := json.Unmarshal(body, &r); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
 		return TotalAdminPermission{}, errors.New("unmarshal: " + err.Error())
 	}
 
@@ -273,6 +276,36 @@ func internalGetPermissions(token, host string) (perms TotalAdminPermission, err
 	}
 
 	return r, nil
+}
+
+func internalVerifyUser(token, host string) (int, error) {
+	req, err := http.NewRequest("POST", host+"/verifyUser", nil)
+	if err != nil {
+		return 0, errors.New("http request making error: " + err.Error())
+	}
+
+	req.Header.Add("Authorization", token)
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return 0, errors.New("http request error: " + err.Error())
+	}
+
+	if resp.StatusCode == 401 || resp.StatusCode == 403 {
+		return 0, errors.New("forbidden")
+	}
+
+	r := response{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return 0, errors.New("unmarshal: " + err.Error())
+	}
+
+	if err := resp.Body.Close(); err != nil {
+		log.Error().Err(err).Send()
+	}
+
+	return r.User, nil
 }
 
 func internalVerifyAdmin(token, host string) (int, error) {
@@ -292,14 +325,9 @@ func internalVerifyAdmin(token, host string) (int, error) {
 		return 0, errors.New("forbidden")
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return 0, errors.New("body parsing error: " + err.Error())
-	}
-
 	r := response{}
 
-	if err := json.Unmarshal(body, &r); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
 		return 0, errors.New("unmarshal: " + err.Error())
 	}
 
