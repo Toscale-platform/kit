@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"github.com/Toscale-platform/kit/env"
 	"github.com/Toscale-platform/kit/log"
 	"github.com/Toscale-platform/kit/output"
 	"github.com/Toscale-platform/kit/validator"
@@ -15,82 +16,74 @@ type response struct {
 	User uint64 `json:"user"`
 }
 
-type Auth struct {
-	isDebug bool
-	host    string
-}
-
 type TotalAdminPermission struct {
-	IsAvaliableTools          bool `json:"tools,omitempty"`
-	IsAvaliableTerminals      bool `json:"terminals,omitempty"`
-	IsAvaliableUsers          bool `json:"users,omitempty"`
-	IsAvaliableBackendTesting bool `json:"backendTesting,omitempty"`
-	IsAvaliableDocumentation  bool `json:"documentation,omitempty"`
-	IsAvaliableInsights       bool `json:"insights,omitempty"`
-	IsAvaliableBalancer       bool `json:"balancer,omitempty"`
-	IsAvaliableNews           bool `json:"news,omitempty"`
-	IsAvaliableTwitter        bool `json:"twitter,omitempty"`
-	IsAvaliableForex          bool `json:"forex,omitempty"`
-	IsAvaliableLanguages      bool `json:"languages,omitempty"`
+	IsAvailableTools          bool `json:"tools,omitempty"`
+	IsAvailableTerminals      bool `json:"terminals,omitempty"`
+	IsAvailableUsers          bool `json:"users,omitempty"`
+	IsAvailableBackendTesting bool `json:"backendTesting,omitempty"`
+	IsAvailableDocumentation  bool `json:"documentation,omitempty"`
+	IsAvailableInsights       bool `json:"insights,omitempty"`
+	IsAvailableBalancer       bool `json:"balancer,omitempty"`
+	IsAvailableNews           bool `json:"news,omitempty"`
+	IsAvailableTwitter        bool `json:"twitter,omitempty"`
+	IsAvailableForex          bool `json:"forex,omitempty"`
+	IsAvailableLanguages      bool `json:"languages,omitempty"`
 }
 
-var httpClient = http.Client{}
+var (
+	Debug      = env.GetBool("DEBUG", false)
+	Host       = env.GetString("AUTH_HOST", "https://auth.toscale.io")
+	httpClient = http.Client{}
+)
 
-func Init(host string, isDebug bool) *Auth {
-	return &Auth{
-		isDebug: isDebug,
-		host:    host,
-	}
-}
-
-func (a *Auth) GetAdminPermissions(ctx *fasthttp.RequestCtx, serviceName string) (permissions TotalAdminPermission, err error) {
-	if !a.isDebug {
-		permissions, err = FetchAdminPermissions(ctx, a.host)
+func GetAdminPermissions(ctx *fasthttp.RequestCtx) (permissions TotalAdminPermission, err error) {
+	if !Debug {
+		permissions, err = FetchAdminPermissions(ctx, Host)
 		if err != nil {
 			return
 		}
 	} else {
 		permissions = TotalAdminPermission{
-			IsAvaliableTools:          true,
-			IsAvaliableTerminals:      true,
-			IsAvaliableUsers:          true,
-			IsAvaliableBackendTesting: true,
-			IsAvaliableDocumentation:  true,
-			IsAvaliableInsights:       true,
-			IsAvaliableBalancer:       true,
-			IsAvaliableNews:           true,
-			IsAvaliableTwitter:        true,
-			IsAvaliableForex:          true,
-			IsAvaliableLanguages:      true,
+			IsAvailableTools:          true,
+			IsAvailableTerminals:      true,
+			IsAvailableUsers:          true,
+			IsAvailableBackendTesting: true,
+			IsAvailableDocumentation:  true,
+			IsAvailableInsights:       true,
+			IsAvailableBalancer:       true,
+			IsAvailableNews:           true,
+			IsAvailableTwitter:        true,
+			IsAvailableForex:          true,
+			IsAvailableLanguages:      true,
 		}
 	}
 
 	return permissions, nil
 }
 
-func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler {
+func ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		var permissions TotalAdminPermission
 		var err error
 
-		if !a.isDebug {
-			permissions, err = FetchAdminPermissions(ctx, a.host)
+		if !Debug {
+			permissions, err = FetchAdminPermissions(ctx, Host)
 			if err != nil {
 				output.JsonMessageResult(ctx, 403, "forbidden")
 				return
 			}
 		} else {
 			permissions = TotalAdminPermission{
-				IsAvaliableTools:          true,
-				IsAvaliableTerminals:      true,
-				IsAvaliableUsers:          true,
-				IsAvaliableBackendTesting: true,
-				IsAvaliableDocumentation:  true,
-				IsAvaliableInsights:       true,
-				IsAvaliableBalancer:       true,
-				IsAvaliableNews:           true,
-				IsAvaliableTwitter:        true,
-				IsAvaliableForex:          true,
+				IsAvailableTools:          true,
+				IsAvailableTerminals:      true,
+				IsAvailableUsers:          true,
+				IsAvailableBackendTesting: true,
+				IsAvailableDocumentation:  true,
+				IsAvailableInsights:       true,
+				IsAvailableBalancer:       true,
+				IsAvailableNews:           true,
+				IsAvailableTwitter:        true,
+				IsAvailableForex:          true,
 			}
 		}
 
@@ -99,67 +92,67 @@ func (a *Auth) ValidateAdminPermissions(next fasthttp.RequestHandler, serviceNam
 		switch serviceName {
 		case "terminals":
 			{
-				if !permissions.IsAvaliableTerminals {
+				if !permissions.IsAvailableTerminals {
 					isInvalid = true
 				}
 			}
 		case "tools":
 			{
-				if !permissions.IsAvaliableTools {
+				if !permissions.IsAvailableTools {
 					isInvalid = true
 				}
 			}
 		case "users":
 			{
-				if !permissions.IsAvaliableUsers {
+				if !permissions.IsAvailableUsers {
 					isInvalid = true
 				}
 			}
 		case "backendTesting":
 			{
-				if !permissions.IsAvaliableBackendTesting {
+				if !permissions.IsAvailableBackendTesting {
 					isInvalid = true
 				}
 			}
 		case "documentation":
 			{
-				if !permissions.IsAvaliableDocumentation {
+				if !permissions.IsAvailableDocumentation {
 					isInvalid = true
 				}
 			}
 		case "insights":
 			{
-				if !permissions.IsAvaliableInsights {
+				if !permissions.IsAvailableInsights {
 					isInvalid = true
 				}
 			}
 		case "balancer":
 			{
-				if !permissions.IsAvaliableBalancer {
+				if !permissions.IsAvailableBalancer {
 					isInvalid = true
 				}
 			}
 		case "news":
 			{
-				if !permissions.IsAvaliableNews {
+				if !permissions.IsAvailableNews {
 					isInvalid = true
 				}
 			}
 		case "twitter":
 			{
-				if !permissions.IsAvaliableTwitter {
+				if !permissions.IsAvailableTwitter {
 					isInvalid = true
 				}
 			}
 		case "forex":
 			{
-				if !permissions.IsAvaliableForex {
+				if !permissions.IsAvailableForex {
 					isInvalid = true
 				}
 			}
 		case "languages":
 			{
-				if !permissions.IsAvaliableLanguages {
+				if !permissions.IsAvailableLanguages {
 					isInvalid = true
 				}
 			}
@@ -188,10 +181,10 @@ func FetchAdminPermissions(ctx *fasthttp.RequestCtx, host string) (perms TotalAd
 	return internalGetPermissions(token, host)
 }
 
-func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+func IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
-		if !a.isDebug {
-			id, err := VerifyAdmin(ctx, a.host)
+		if !Debug {
+			id, err := VerifyAdmin(ctx, Host)
 			if err != nil {
 				output.JsonMessageResult(ctx, 403, "forbidden")
 				return
@@ -206,9 +199,9 @@ func (a *Auth) IsAdmin(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	}
 }
 
-func (a *Auth) IsAdminFiber(c *fiber.Ctx) error {
-	if !a.isDebug {
-		id, err := VerifyAdminFiber(c, a.host)
+func IsAdminFiber(c *fiber.Ctx) error {
+	if !Debug {
+		id, err := VerifyAdminFiber(c, Host)
 		if err != nil {
 			return fiber.NewError(403, "forbidden")
 		}

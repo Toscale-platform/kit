@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	Debug = env.GetBool("DEBUG")
-	Host  = "https://auth.toscale.io"
+	Debug = env.GetBool("DEBUG", false)
+	Host  = env.GetString("AUTH_HOST", "https://auth.toscale.io")
 )
 
 func Cors(c *fiber.Ctx) error {
