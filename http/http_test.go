@@ -1,6 +1,9 @@
 package http
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 type User struct {
 	ID        int    `json:"id"`
@@ -35,20 +38,13 @@ func TestGet(t *testing.T) {
 	todo := Todo{}
 
 	err := Get("https://dummyjson.com/todos/1", &todo)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if todo.ID != 1 {
-		t.Error("todo id not equal 1")
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, todo.ID, 1)
 }
 
 func TestNilVGet(t *testing.T) {
 	err := Get("https://dummyjson.com/todos/1", nil)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Nil(t, err)
 }
 
 func TestGetWithToken(t *testing.T) {
@@ -59,25 +55,15 @@ func TestGetWithToken(t *testing.T) {
 	}
 
 	err := Post("https://dummyjson.com/auth/login", &body, &user)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if user.ID != 15 {
-		t.Error("user id not equal 15")
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, user.ID, 15)
 
 	token := user.Token
 	user = User{}
 
 	err = GetWithToken("https://dummyjson.com/auth/me", token, &user)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if user.ID != 15 {
-		t.Error("user id not equal 15")
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, user.ID, 15)
 }
 
 func TestPost(t *testing.T) {
@@ -89,19 +75,8 @@ func TestPost(t *testing.T) {
 	}
 
 	err := Post("https://dummyjson.com/todos/add", &body, &todo)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if todo.Todo != "Test" {
-		t.Error("todo name not equal Test")
-	}
-
-	if !todo.Completed {
-		t.Error("todo completed not equal true")
-	}
-
-	if todo.UserID != 5 {
-		t.Error("todo user id not equal 5")
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, todo.Todo, "Test")
+	assert.True(t, todo.Completed)
+	assert.Equal(t, todo.UserID, 5)
 }

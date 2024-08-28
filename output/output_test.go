@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/goccy/go-json"
+	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttputil"
 	"testing"
@@ -45,10 +46,7 @@ func TestCORSOptions(t *testing.T) {
 		CORSOptions(ctx)
 	})
 
-	contentType := string(resp.Header.Peek("Content-Type"))
-	if contentType != `text/html` {
-		t.Errorf("content-type: %s", contentType)
-	}
+	assert.Equal(t, string(resp.Header.Peek("Content-Type")), "text/html")
 }
 
 func TestOutputJson(t *testing.T) {
@@ -56,10 +54,7 @@ func TestOutputJson(t *testing.T) {
 		OutputJson(ctx, 200, out{Code: 123, Message: "test"})
 	})
 
-	body := string(resp.Body())
-	if body != `{"code":123,"message":"test"}` {
-		t.Errorf("body: %s", body)
-	}
+	assert.Equal(t, string(resp.Body()), `{"code":123,"message":"test"}`)
 }
 
 func TestJsonNoIndent(t *testing.T) {
@@ -67,10 +62,7 @@ func TestJsonNoIndent(t *testing.T) {
 		JsonNoIndent(ctx, 200, out{Code: 123, Message: "test"})
 	})
 
-	body := string(resp.Body())
-	if body != `{"code":123,"message":"test"}` {
-		t.Errorf("body: %s", body)
-	}
+	assert.Equal(t, string(resp.Body()), `{"code":123,"message":"test"}`)
 }
 
 func TestJsonMessageResult(t *testing.T) {
@@ -78,10 +70,7 @@ func TestJsonMessageResult(t *testing.T) {
 		JsonMessageResult(ctx, 200, "test")
 	})
 
-	body := string(resp.Body())
-	if body != `{"code":200,"message":"test"}` {
-		t.Errorf("body: %s", body)
-	}
+	assert.Equal(t, string(resp.Body()), `{"code":200,"message":"test"}`)
 }
 
 func getResult() []byte {
@@ -101,10 +90,7 @@ func TestFprint(t *testing.T) {
 		}
 	})
 
-	body := string(resp.Body())
-	if body != `{"code":200,"message":"test"}` {
-		t.Errorf("body: %s", body)
-	}
+	assert.Equal(t, string(resp.Body()), `{"code":200,"message":"test"}`)
 }
 
 func TestWrite(t *testing.T) {
@@ -116,10 +102,7 @@ func TestWrite(t *testing.T) {
 		}
 	})
 
-	body := string(resp.Body())
-	if body != `{"code":200,"message":"test"}` {
-		t.Errorf("body: %s", body)
-	}
+	assert.Equal(t, string(resp.Body()), `{"code":200,"message":"test"}`)
 }
 
 func BenchmarkFprint(b *testing.B) {

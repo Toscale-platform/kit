@@ -2,33 +2,19 @@ package env
 
 import (
 	"cmp"
+	"github.com/stretchr/testify/assert"
 	"reflect"
-	"slices"
 	"testing"
 )
 
 func test[X comparable](t *testing.T, wantType string, got X, want X) {
-	gotType := reflect.TypeOf(got).String()
-	if gotType != wantType {
-		t.Errorf("got type %s, want %s", gotType, wantType)
-		return
-	}
-
-	if got != want {
-		t.Errorf("got %v, wanted %v", got, want)
-	}
+	assert.Equal(t, wantType, reflect.TypeOf(got).String())
+	assert.Equal(t, want, got)
 }
 
 func testSlice[X ~[]E, E cmp.Ordered](t *testing.T, wantType string, got X, want X) {
-	gotType := reflect.TypeOf(got).String()
-	if gotType != wantType {
-		t.Errorf("got type %s, want %s", gotType, wantType)
-		return
-	}
-
-	if slices.Compare(got, want) != 0 {
-		t.Errorf("got %v, wanted %v", got, want)
-	}
+	assert.Equal(t, wantType, reflect.TypeOf(got).String())
+	assert.Equal(t, want, got)
 }
 
 // String
