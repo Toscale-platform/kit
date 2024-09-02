@@ -89,19 +89,10 @@ Thanks: [go-playground/validator](https://github.com/go-playground/validator)
 ```go
 import "github.com/Toscale-platform/kit/validator"
 
-if validator.Is("email@example.com", "required,email") {
-	//
-}
-
-if validator.IsSymbol("BTC/USDT") {
-    //
-}
-
 if validator.IsExchange("binance") {
     //
 }
 ```
-
 
 ### Output
 
