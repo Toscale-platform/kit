@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/Toscale-platform/kit/tests"
 	"testing"
 )
 
@@ -38,13 +38,13 @@ func TestGet(t *testing.T) {
 	todo := Todo{}
 
 	err := Get("https://dummyjson.com/todos/1", &todo)
-	assert.Nil(t, err)
-	assert.Equal(t, todo.ID, 1)
+	tests.Err(t, err)
+	tests.Equal(t, todo.ID, 1)
 }
 
 func TestNilVGet(t *testing.T) {
 	err := Get("https://dummyjson.com/todos/1", nil)
-	assert.Nil(t, err)
+	tests.Err(t, err)
 }
 
 func TestGetWithToken(t *testing.T) {
@@ -55,15 +55,15 @@ func TestGetWithToken(t *testing.T) {
 	}
 
 	err := Post("https://dummyjson.com/auth/login", &body, &user)
-	assert.Nil(t, err)
-	assert.Equal(t, user.ID, 15)
+	tests.Err(t, err)
+	tests.Equal(t, user.ID, 15)
 
 	token := user.Token
 	user = User{}
 
 	err = GetWithToken("https://dummyjson.com/auth/me", token, &user)
-	assert.Nil(t, err)
-	assert.Equal(t, user.ID, 15)
+	tests.Err(t, err)
+	tests.Equal(t, user.ID, 15)
 }
 
 func TestPost(t *testing.T) {
@@ -75,8 +75,8 @@ func TestPost(t *testing.T) {
 	}
 
 	err := Post("https://dummyjson.com/todos/add", &body, &todo)
-	assert.Nil(t, err)
-	assert.Equal(t, todo.Todo, "Test")
-	assert.True(t, todo.Completed)
-	assert.Equal(t, todo.UserID, 5)
+	tests.Err(t, err)
+	tests.Equal(t, todo.Todo, "Test")
+	tests.True(t, todo.Completed)
+	tests.Equal(t, todo.UserID, 5)
 }

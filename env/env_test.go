@@ -2,19 +2,20 @@ package env
 
 import (
 	"cmp"
-	"github.com/stretchr/testify/assert"
+	"github.com/Toscale-platform/kit/tests"
 	"reflect"
+	"slices"
 	"testing"
 )
 
 func test[X comparable](t *testing.T, wantType string, got X, want X) {
-	assert.Equal(t, wantType, reflect.TypeOf(got).String())
-	assert.Equal(t, want, got)
+	tests.Equal(t, wantType, reflect.TypeOf(got).String())
+	tests.Equal(t, want, got)
 }
 
 func testSlice[X ~[]E, E cmp.Ordered](t *testing.T, wantType string, got X, want X) {
-	assert.Equal(t, wantType, reflect.TypeOf(got).String())
-	assert.Equal(t, want, got)
+	tests.Equal(t, wantType, reflect.TypeOf(got).String())
+	tests.Equal(t, slices.Compare(want, got), 0)
 }
 
 // String

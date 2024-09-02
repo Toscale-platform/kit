@@ -1,7 +1,7 @@
 package graphql
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/Toscale-platform/kit/tests"
 	"github.com/valyala/fasthttp"
 	"net"
 	"net/http"
@@ -28,10 +28,10 @@ func TestDoJSON(t *testing.T) {
 	var calls int
 	url, cl := makeServer(func(ctx *fasthttp.RequestCtx) {
 		calls++
-		assert.Equal(t, string(ctx.Request.Header.Method()), http.MethodPost)
+		tests.Equal(t, string(ctx.Request.Header.Method()), http.MethodPost)
 
 		b := ctx.Request.Body()
-		assert.Equal(t, string(b), `{"query":"query {}","variables":null}`)
+		tests.Equal(t, string(b), `{"query":"query {}","variables":null}`)
 
 		ctx.WriteString(`{
 			"data": {
@@ -46,20 +46,20 @@ func TestDoJSON(t *testing.T) {
 	var responseData map[string]interface{}
 
 	err := client.Run(&Request{q: "query {}"}, &responseData, 30*time.Second)
-	assert.Nil(t, err)
+	tests.Err(t, err)
 
-	assert.Equal(t, calls, 1) // calls
-	assert.Equal(t, responseData["something"], "yes")
+	tests.Equal(t, calls, 1) // calls
+	tests.Equal(t, responseData["something"], "yes")
 }
 
 func TestDoJSONBadRequestErr(t *testing.T) {
 	var calls int
 	url, cl := makeServer(func(ctx *fasthttp.RequestCtx) {
 		calls++
-		assert.Equal(t, string(ctx.Request.Header.Method()), http.MethodPost)
+		tests.Equal(t, string(ctx.Request.Header.Method()), http.MethodPost)
 
 		b := ctx.Request.Body()
-		assert.Equal(t, string(b), `{"query":"query {}","variables":null}`)
+		tests.Equal(t, string(b), `{"query":"query {}","variables":null}`)
 
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		ctx.WriteString(`{
@@ -75,9 +75,9 @@ func TestDoJSONBadRequestErr(t *testing.T) {
 	var responseData map[string]interface{}
 
 	err := client.Run(&Request{q: "query {}"}, &responseData, 30*time.Second)
-	assert.NotEqual(t, err, nil)
-	assert.Equal(t, calls, 1)
-	assert.Equal(t, err.Error(), "graphql: miscellaneous message as to why the the request was bad")
+	tests.HasErr(t, err)
+	tests.Equal(t, calls, 1)
+	tests.Equal(t, err.Error(), "graphql: miscellaneous message as to why the the request was bad")
 }
 
 func TestQueryJSON(t *testing.T) {
@@ -85,10 +85,10 @@ func TestQueryJSON(t *testing.T) {
 	url, cl := makeServer(func(ctx *fasthttp.RequestCtx) {
 		calls++
 		b := ctx.Request.Body()
-		assert.Equal(t, string(b), `{"query":"query {}","variables":{"username":"matryer"}}`)
+		tests.Equal(t, string(b), `{"query":"query {}","variables":{"username":"matryer"}}`)
 
 		_, err := ctx.WriteString(`{"data":{"value":"some data"}}`)
-		assert.Nil(t, err)
+		tests.Err(t, err)
 	})
 	defer cl()
 
@@ -98,28 +98,28 @@ func TestQueryJSON(t *testing.T) {
 	req.Var("username", "matryer")
 
 	// check variables
-	assert.NotEqual(t, req, nil)
-	assert.Equal(t, req.vars["username"], "matryer")
+	tests.Nil(t, req)
+	tests.Equal(t, req.vars["username"], "matryer")
 
 	var resp struct {
 		Value string
 	}
 
-	err := client.Run(req, &resp, 1*time.Second)
-	assert.Nil(t, err)
+	err := client.Run(req, &resp, time.Second)
+	tests.Err(t, err)
 
-	assert.Equal(t, calls, 1)
-	assert.Equal(t, resp.Value, "some data")
+	tests.Equal(t, calls, 1)
+	tests.Equal(t, resp.Value, "some data")
 }
 
 func TestHeader(t *testing.T) {
 	var calls int
 	url, cl := makeServer(func(ctx *fasthttp.RequestCtx) {
 		calls++
-		assert.Equal(t, string(ctx.Request.Header.Peek("X-Custom-Header")), "123")
+		tests.Equal(t, string(ctx.Request.Header.Peek("X-Custom-Header")), "123")
 
 		_, err := ctx.WriteString(`{"data":{"value":"some data"}}`)
-		assert.Nil(t, err)
+		tests.Err(t, err)
 	})
 	defer cl()
 
@@ -132,11 +132,11 @@ func TestHeader(t *testing.T) {
 		Value string
 	}
 
-	err := client.Run(req, &resp, 1*time.Second)
-	assert.Nil(t, err)
+	err := client.Run(req, &resp, time.Second)
+	tests.Err(t, err)
 
-	assert.Equal(t, calls, 1)
-	assert.Equal(t, resp.Value, "some data")
+	tests.Equal(t, calls, 1)
+	tests.Equal(t, resp.Value, "some data")
 }
 
 func TestRealAPI(t *testing.T) {
@@ -147,7 +147,7 @@ func TestRealAPI(t *testing.T) {
 	var responseData map[string]interface{}
 
 	err := client.Run(req, &responseData, 30*time.Second)
-	assert.Nil(t, err)
+	tests.Err(t, err)
 
-	assert.Equal(t, responseData["post"].(map[string]interface{})["id"], "1")
+	tests.Equal(t, responseData["post"].(map[string]interface{})["id"], "1")
 }
