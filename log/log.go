@@ -5,6 +5,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -18,15 +19,7 @@ func init() {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
-		short := file
-		for i := len(file) - 1; i > 0; i-- {
-			if file[i] == '/' {
-				short = file[i+1:]
-				break
-			}
-		}
-		file = short
-		return file + ":" + strconv.Itoa(line)
+		return filepath.Base(file) + ":" + strconv.Itoa(line)
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"io"
+	"path/filepath"
 	"strconv"
 	"testing"
 )
@@ -13,15 +14,7 @@ func BenchmarkBase(b *testing.B) {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
-		short := file
-		for i := len(file) - 1; i > 0; i-- {
-			if file[i] == '/' {
-				short = file[i+1:]
-				break
-			}
-		}
-		file = short
-		return file + ":" + strconv.Itoa(line)
+		return filepath.Base(file) + ":" + strconv.Itoa(line)
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -32,19 +25,11 @@ func BenchmarkBase(b *testing.B) {
 func BenchmarkPretty(b *testing.B) {
 	var l = log.Output(zerolog.ConsoleWriter{
 		Out:        io.Discard,
-		TimeFormat: "02 Jan 15:04:05",
+		TimeFormat: "02 Jan 15:04",
 	}).With().Caller().Logger()
 
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
-		short := file
-		for i := len(file) - 1; i > 0; i-- {
-			if file[i] == '/' {
-				short = file[i+1:]
-				break
-			}
-		}
-		file = short
-		return file + ":" + strconv.Itoa(line)
+		return filepath.Base(file) + ":" + strconv.Itoa(line)
 	}
 
 	for i := 0; i < b.N; i++ {
