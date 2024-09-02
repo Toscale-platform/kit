@@ -84,8 +84,6 @@ err := client.Run(req, &respData, time.Minute)
 
 ### Validator
 
-Thanks: [go-playground/validator](https://github.com/go-playground/validator)
-
 ```go
 import "github.com/Toscale-platform/kit/validator"
 
@@ -117,11 +115,7 @@ func handler(ctx *fasthttp.RequestCtx){
 ```go
 import "github.com/Toscale-platform/kit/auth"
 
-isDebug := env.GetBool("DEBUG")
-host := env.GetString("AUTH_HOST")
-authManager := auth.Init(host, isDebug)
-
 r := router.New()
 
-r.GET("/path", authManager.IsAdmin(handler))
+r.GET("/path", auth.IsAdmin(handler))
 ```
