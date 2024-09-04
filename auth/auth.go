@@ -5,11 +5,11 @@ import (
 	"github.com/Toscale-platform/kit/env"
 	"github.com/Toscale-platform/kit/log"
 	"github.com/Toscale-platform/kit/output"
-	"github.com/Toscale-platform/kit/validator"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
 	"net/http"
+	"strings"
 )
 
 type response struct {
@@ -174,7 +174,7 @@ func ValidateAdminPermissions(next fasthttp.RequestHandler, serviceName string) 
 
 func FetchAdminPermissions(ctx *fasthttp.RequestCtx, host string) (perms TotalAdminPermission, err error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
-	if validator.IsEmpty(token) {
+	if strings.TrimSpace(token) == "" {
 		return TotalAdminPermission{}, errors.New("bearer token required")
 	}
 
@@ -216,7 +216,7 @@ func IsAdminFiber(c *fiber.Ctx) error {
 
 func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (uint64, error) {
 	token := string(ctx.Request.Header.Peek("Authorization"))
-	if validator.IsEmpty(token) {
+	if strings.TrimSpace(token) == "" {
 		return 0, errors.New("bearer token required")
 	}
 
@@ -225,7 +225,7 @@ func VerifyAdmin(ctx *fasthttp.RequestCtx, host string) (uint64, error) {
 
 func VerifyUserFiber(c *fiber.Ctx, host string) (uint64, error) {
 	token := c.Get("Authorization")
-	if validator.IsEmpty(token) {
+	if strings.TrimSpace(token) == "" {
 		return 0, errors.New("bearer token required")
 	}
 
@@ -234,7 +234,7 @@ func VerifyUserFiber(c *fiber.Ctx, host string) (uint64, error) {
 
 func VerifyAdminFiber(c *fiber.Ctx, host string) (uint64, error) {
 	token := c.Get("Authorization")
-	if validator.IsEmpty(token) {
+	if strings.TrimSpace(token) == "" {
 		return 0, errors.New("bearer token required")
 	}
 
